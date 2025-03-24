@@ -12,7 +12,7 @@ interface GeminiResponse {
   text: string;
 }
 
-const API_KEY = "TEMP_KEY"; // Substitua por seu próprio API_KEY ao usar
+const API_KEY = "AIzaSyCb02UOLsV2yiZNq9FK-zZcIdp9KCn91AA"; // Substitua por seu próprio API_KEY ao usar
 
 export const getGeminiSuggestion = async ({ prompt, type }: GeminiRequestParams): Promise<string> => {
   try {
