@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import PromptField from "./PromptField";
 import PromptPreview from "./PromptPreview";
@@ -14,7 +13,7 @@ import {
   Wand, 
   RefreshCw,
   CheckCircle2,
-  Robot,
+  Bot,
   Eye,
   Star 
 } from "lucide-react";
@@ -311,7 +310,7 @@ const PromptGenerator: React.FC<PromptGeneratorProps> = ({ className }) => {
                 {isGenerating ? (
                   <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
                 ) : (
-                  <Robot className="h-4 w-4 mr-2" />
+                  <Bot className="h-4 w-4 mr-2" />
                 )}
                 Gerar com IA
               </Button>
