@@ -4,6 +4,8 @@ import PromptField from "./PromptField";
 import PromptPreview from "./PromptPreview";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { FileText, Lightbulb, HelpCircle, MessageSquare, Sparkles } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface PromptGeneratorProps {
   className?: string;
@@ -110,87 +112,103 @@ const PromptGenerator: React.FC<PromptGeneratorProps> = ({ className }) => {
   };
 
   return (
-    <div className={cn("container mx-auto px-4 py-8", className)}>
+    <div className={cn("container mx-auto px-4 py-4", className)}>
       <div className="flex flex-col space-y-8 md:flex-row md:space-y-0 md:space-x-8">
         <div className="w-full md:w-1/2">
-          <div className="mb-8 animate-slide-down">
-            <h2 className="text-xl font-medium mb-4">Modelos</h2>
-            <div className="flex flex-wrap gap-2">
-              {Object.entries(PRESET_TEMPLATES).map(([key, template]) => (
-                <Button
-                  key={key}
-                  variant={activeTemplate === key ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => handleTemplateChange(key)}
-                  className="transition-all duration-200"
-                >
-                  {template.name}
-                </Button>
-              ))}
-            </div>
-          </div>
+          <Card className="mb-8 bg-white/90 dark:bg-card shadow-md border-primary/10 animate-slide-down">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-xl font-medium flex items-center">
+                <Sparkles className="h-5 w-5 mr-2 text-primary" />
+                Modelos Pré-definidos
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-wrap gap-2">
+                {Object.entries(PRESET_TEMPLATES).map(([key, template]) => (
+                  <Button
+                    key={key}
+                    variant={activeTemplate === key ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => handleTemplateChange(key)}
+                    className="transition-all duration-200"
+                  >
+                    {template.name}
+                  </Button>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
 
-          <div className="p-6 rounded-xl glass-panel">
-            <h2 className="text-xl font-medium mb-6">Componentes do Prompt</h2>
-            
-            <PromptField
-              label="Papel"
-              name="role"
-              value={formState.role}
-              onChange={(value) => handleInputChange("role", value)}
-              placeholder="Descreva o papel e identidade da IA"
-              helperText="Defina quem é a IA e que expertise ela possui"
-            />
-            
-            <PromptField
-              label="Objetivo"
-              name="goal"
-              value={formState.goal}
-              onChange={(value) => handleInputChange("goal", value)}
-              placeholder="O que a IA deve ajudar a realizar?"
-              helperText="O objetivo ou propósito principal da IA"
-            />
-            
-            <PromptField
-              label="Restrições"
-              name="constraints"
-              value={formState.constraints}
-              onChange={(value) => handleInputChange("constraints", value)}
-              placeholder="Quais limites a IA deve ter?"
-              helperText="Limitações, restrições ou limites para a IA"
-              multiline
-            />
-            
-            <PromptField
-              label="Diretrizes"
-              name="guidelines"
-              value={formState.guidelines}
-              onChange={(value) => handleInputChange("guidelines", value)}
-              placeholder="Como a IA deve abordar tarefas?"
-              helperText="Instruções sobre metodologia, abordagem ou raciocínio"
-              multiline
-            />
-            
-            <PromptField
-              label="Formato de Saída"
-              name="output"
-              value={formState.output}
-              onChange={(value) => handleInputChange("output", value)}
-              placeholder="Como as respostas devem ser estruturadas?"
-              helperText="Instruções sobre estilo, tom e formato das respostas"
-              multiline
-            />
-            
-            <PromptField
-              label="Exemplos"
-              name="examples"
-              value={formState.examples}
-              onChange={(value) => handleInputChange("examples", value)}
-              placeholder="Exemplos de trocas para demonstrar o comportamento desejado"
-              helperText="Demonstre com exemplos como a IA deve responder"
-              multiline
-            />
-          </div>
+          <Card className="glass-panel shadow-md border-primary/10">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-xl font-medium flex items-center">
+                <FileText className="h-5 w-5 mr-2 text-primary" />
+                Componentes do Prompt
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <PromptField
+                label="Papel"
+                name="role"
+                value={formState.role}
+                onChange={(value) => handleInputChange("role", value)}
+                placeholder="Descreva o papel e identidade da IA"
+                helperText="Defina quem é a IA e que expertise ela possui"
+                icon={<MessageSquare className="h-4 w-4" />}
+              />
+              
+              <PromptField
+                label="Objetivo"
+                name="goal"
+                value={formState.goal}
+                onChange={(value) => handleInputChange("goal", value)}
+                placeholder="O que a IA deve ajudar a realizar?"
+                helperText="O objetivo ou propósito principal da IA"
+                icon={<Lightbulb className="h-4 w-4" />}
+              />
+              
+              <PromptField
+                label="Restrições"
+                name="constraints"
+                value={formState.constraints}
+                onChange={(value) => handleInputChange("constraints", value)}
+                placeholder="Quais limites a IA deve ter?"
+                helperText="Limitações, restrições ou limites para a IA"
+                multiline
+              />
+              
+              <PromptField
+                label="Diretrizes"
+                name="guidelines"
+                value={formState.guidelines}
+                onChange={(value) => handleInputChange("guidelines", value)}
+                placeholder="Como a IA deve abordar tarefas?"
+                helperText="Instruções sobre metodologia, abordagem ou raciocínio"
+                multiline
+                icon={<HelpCircle className="h-4 w-4" />}
+              />
+              
+              <PromptField
+                label="Formato de Saída"
+                name="output"
+                value={formState.output}
+                onChange={(value) => handleInputChange("output", value)}
+                placeholder="Como as respostas devem ser estruturadas?"
+                helperText="Instruções sobre estilo, tom e formato das respostas"
+                multiline
+              />
+              
+              <PromptField
+                label="Exemplos"
+                name="examples"
+                value={formState.examples}
+                onChange={(value) => handleInputChange("examples", value)}
+                placeholder="Exemplos de trocas para demonstrar o comportamento desejado"
+                helperText="Demonstre com exemplos como a IA deve responder"
+                multiline
+              />
+            </CardContent>
+          </Card>
         </div>
         
         <div className="w-full md:w-1/2">

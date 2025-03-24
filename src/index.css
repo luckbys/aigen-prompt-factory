@@ -7,7 +7,7 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
+    --background: 220 30% 98%;
     --foreground: 220 20% 12%;
 
     --card: 0 0% 100%;
@@ -16,7 +16,7 @@
     --popover: 0 0% 100%;
     --popover-foreground: 220 20% 12%;
 
-    --primary: 220 60% 50%;
+    --primary: 250 90% 64%;
     --primary-foreground: 0 0% 100%;
 
     --secondary: 220 10% 96%;
@@ -33,7 +33,7 @@
 
     --border: 220 15% 90%;
     --input: 220 15% 90%;
-    --ring: 220 60% 50%;
+    --ring: 250 90% 64%;
 
     --radius: 0.5rem;
 
@@ -57,7 +57,7 @@
     --popover: 220 20% 10%;
     --popover-foreground: 220 10% 90%;
 
-    --primary: 220 60% 50%;
+    --primary: 250 90% 64%;
     --primary-foreground: 0 0% 100%;
 
     --secondary: 220 20% 16%;
@@ -74,7 +74,7 @@
 
     --border: 220 20% 16%;
     --input: 220 20% 16%;
-    --ring: 220 60% 50%;
+    --ring: 250 90% 64%;
     
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
@@ -95,6 +95,12 @@
   body {
     @apply bg-background text-foreground antialiased;
     font-feature-settings: "rlig" 1, "calt" 1;
+    background-image: radial-gradient(
+      circle at top right,
+      rgba(var(--primary-rgb), 0.05) 0%,
+      rgba(var(--primary-rgb), 0) 60%
+    );
+    background-attachment: fixed;
   }
   
   /* Smooth scrolling */
@@ -145,3 +151,8 @@
     to { opacity: 1; transform: translateY(0px); }
   }
 }
+
+:root {
+  --primary-rgb: 124, 58, 237; /* RGB equivalent of hsl(250, 90%, 64%) */
+}
+
