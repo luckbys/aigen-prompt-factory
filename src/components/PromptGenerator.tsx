@@ -2,10 +2,25 @@
 import React, { useState, useEffect } from "react";
 import PromptField from "./PromptField";
 import PromptPreview from "./PromptPreview";
+import PromptTips from "./PromptTips";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { FileText, Lightbulb, HelpCircle, MessageSquare, Sparkles } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { 
+  FileText, 
+  Lightbulb, 
+  HelpCircle, 
+  MessageSquare, 
+  Sparkles, 
+  Wand, 
+  RefreshCw,
+  CheckCircle2,
+  Robot,
+  Eye,
+  Star 
+} from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
+import { getGeminiSuggestion } from "@/services/geminiService";
+import { toast } from "sonner";
 
 interface PromptGeneratorProps {
   className?: string;
@@ -57,6 +72,15 @@ const PRESET_TEMPLATES: { [key: string]: PromptTemplate } = {
     guidelines: "Pergunte sobre visão criativa e objetivos. Desenvolva as ideias do usuário. Forneça opções variadas.",
     output: "Responda com linguagem vívida e descritiva. Ofereça múltiplas alternativas criativas. Seja divertido, mas profissional.",
     examples: "Usuário: Preciso de ideias para uma história de ficção científica ambientada debaixo d'água.\nCriativo: Que tal uma civilização que evoluiu nas profundezas do oceano, desenvolvendo tecnologia bioluminescente em vez de eletrônica?"
+  },
+  teacher: {
+    name: "Professor Educativo",
+    role: "Você é um professor paciente e educativo, especializado em explicar conceitos complexos.",
+    goal: "Ajudar os usuários a compreenderem melhor tópicos difíceis e expandir seu conhecimento.",
+    constraints: "Não faça o trabalho escolar pelo usuário. Em vez disso, oriente-o no processo de aprendizagem.",
+    guidelines: "Use analogias e exemplos do mundo real. Adapte explicações ao nível de conhecimento do usuário. Faça perguntas para verificar o entendimento.",
+    output: "Explique em etapas claras. Use linguagem acessível. Ofereça recursos adicionais quando relevante.",
+    examples: "Usuário: Por que o céu é azul?\nProfessor: O céu aparece azul devido a um fenômeno chamado espalhamento de Rayleigh. Quando a luz solar atinge a atmosfera, as moléculas de ar espalham a luz azul mais do que outras cores porque a luz azul tem comprimentos de onda mais curtos. Imagine jogar muitas bolas pequenas em uma multidão - as bolas menores (luz azul) tendem a ricochetear mais."
   }
 };
 
@@ -64,6 +88,8 @@ const PromptGenerator: React.FC<PromptGeneratorProps> = ({ className }) => {
   const [activeTemplate, setActiveTemplate] = useState<string>("assistant");
   const [formState, setFormState] = useState<PromptTemplate>(PRESET_TEMPLATES.assistant);
   const [generatedPrompt, setGeneratedPrompt] = useState<string>("");
+  const [isGenerating, setIsGenerating] = useState<boolean>(false);
+  const [isImproving, setIsImproving] = useState<boolean>(false);
 
   useEffect(() => {
     generatePrompt();
@@ -111,14 +137,82 @@ const PromptGenerator: React.FC<PromptGeneratorProps> = ({ className }) => {
     setGeneratedPrompt(prompt.trim());
   };
 
+  const handleApplyTip = (tip: string) => {
+    // Determinar em qual campo aplicar a dica baseado no conteúdo
+    if (tip.includes("tom") || tip.includes("comunique")) {
+      handleInputChange("output", formState.output + (formState.output ? "\n\n" : "") + tip);
+    } else if (tip.includes("exemplo") || tip.includes("Usuário:")) {
+      handleInputChange("examples", formState.examples + (formState.examples ? "\n\n" : "") + tip);
+    } else if (tip.includes("não deve") || tip.includes("limitação")) {
+      handleInputChange("constraints", formState.constraints + (formState.constraints ? "\n\n" : "") + tip);
+    } else if (tip.includes("estruture") || tip.includes("formatada")) {
+      handleInputChange("output", formState.output + (formState.output ? "\n\n" : "") + tip);
+    } else {
+      handleInputChange("guidelines", formState.guidelines + (formState.guidelines ? "\n\n" : "") + tip);
+    }
+
+    toast.success("Dica aplicada com sucesso!");
+  };
+
+  const handleGenerateWithGemini = async () => {
+    setIsGenerating(true);
+    try {
+      // Preparar os campos preenchidos para a geração
+      const promptText = Object.entries(formState)
+        .filter(([key, value]) => value && key !== 'name')
+        .map(([key, value]) => `${key.toUpperCase()}: ${value}`)
+        .join("\n\n");
+
+      const suggestion = await getGeminiSuggestion({
+        prompt: promptText,
+        type: 'generate'
+      });
+
+      if (suggestion) {
+        setGeneratedPrompt(suggestion);
+        toast.success("Prompt gerado com IA!");
+      }
+    } catch (error) {
+      console.error("Erro ao gerar com IA:", error);
+      toast.error("Não foi possível gerar o prompt. Tente novamente.");
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const handleImprovePrompt = async () => {
+    if (!generatedPrompt) {
+      toast.error("Gere um prompt primeiro antes de melhorá-lo.");
+      return;
+    }
+
+    setIsImproving(true);
+    try {
+      const improvedPrompt = await getGeminiSuggestion({
+        prompt: generatedPrompt,
+        type: 'improve'
+      });
+
+      if (improvedPrompt) {
+        setGeneratedPrompt(improvedPrompt);
+        toast.success("Prompt aprimorado com sucesso!");
+      }
+    } catch (error) {
+      console.error("Erro ao melhorar prompt:", error);
+      toast.error("Não foi possível melhorar o prompt. Tente novamente.");
+    } finally {
+      setIsImproving(false);
+    }
+  };
+
   return (
     <div className={cn("container mx-auto px-4 py-4", className)}>
       <div className="flex flex-col space-y-8 md:flex-row md:space-y-0 md:space-x-8">
-        <div className="w-full md:w-1/2">
+        <div className="w-full md:w-2/5">
           <Card className="mb-8 bg-white/90 dark:bg-card shadow-md border-primary/10 animate-slide-down">
             <CardHeader className="pb-2">
               <CardTitle className="text-xl font-medium flex items-center">
-                <Sparkles className="h-5 w-5 mr-2 text-primary" />
+                <Star className="h-5 w-5 mr-2 text-primary" />
                 Modelos Pré-definidos
               </CardTitle>
             </CardHeader>
@@ -139,7 +233,7 @@ const PromptGenerator: React.FC<PromptGeneratorProps> = ({ className }) => {
             </CardContent>
           </Card>
 
-          <Card className="glass-panel shadow-md border-primary/10">
+          <Card className="glass-panel shadow-md border-primary/10 mb-8">
             <CardHeader className="pb-2">
               <CardTitle className="text-xl font-medium flex items-center">
                 <FileText className="h-5 w-5 mr-2 text-primary" />
@@ -208,10 +302,59 @@ const PromptGenerator: React.FC<PromptGeneratorProps> = ({ className }) => {
                 multiline
               />
             </CardContent>
+            <CardFooter className="flex justify-center gap-4 border-t border-border p-4">
+              <Button 
+                onClick={handleGenerateWithGemini} 
+                className="w-full"
+                disabled={isGenerating}
+              >
+                {isGenerating ? (
+                  <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                ) : (
+                  <Robot className="h-4 w-4 mr-2" />
+                )}
+                Gerar com IA
+              </Button>
+              <Button 
+                variant="outline" 
+                onClick={handleImprovePrompt}
+                className="w-full"
+                disabled={isImproving || !generatedPrompt}
+              >
+                {isImproving ? (
+                  <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                ) : (
+                  <Wand className="h-4 w-4 mr-2" />
+                )}
+                Aprimorar Prompt
+              </Button>
+            </CardFooter>
           </Card>
+          
+          <PromptTips onApplyTip={handleApplyTip} className="mb-8" />
         </div>
         
-        <div className="w-full md:w-1/2">
+        <div className="w-full md:w-3/5">
+          <Card className="mb-6 p-4 bg-white/90 dark:bg-card/90 shadow-md border-primary/10">
+            <div className="flex items-center">
+              <Eye className="h-5 w-5 mr-2 text-primary" />
+              <h3 className="text-lg font-medium">Visualização do Prompt</h3>
+              <div className="ml-auto flex gap-2">
+                <Button variant="outline" size="sm" onClick={generatePrompt}>
+                  <RefreshCw className="h-3 w-3 mr-1" />
+                  Atualizar
+                </Button>
+                <Button variant="outline" size="sm" onClick={handleImprovePrompt} disabled={isImproving || !generatedPrompt}>
+                  {isImproving ? (
+                    <RefreshCw className="h-3 w-3 mr-1 animate-spin" />
+                  ) : (
+                    <Wand className="h-3 w-3 mr-1" />
+                  )}
+                  Aprimorar
+                </Button>
+              </div>
+            </div>
+          </Card>
           <PromptPreview prompt={generatedPrompt} className="sticky top-24" />
         </div>
       </div>

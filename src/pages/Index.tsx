@@ -19,7 +19,7 @@ const Index = () => {
             </h1>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
               Crie prompts de sistema eficazes para agentes de IA com este gerador intuitivo.
-              Elabore instruções perfeitas para obter os resultados que deseja.
+              Use o Gemini para aprimorar suas instruções e obter os melhores resultados.
             </p>
           </div>
           
