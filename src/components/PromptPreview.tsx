@@ -78,7 +78,7 @@ const PromptPreview: React.FC<PromptPreviewProps> = ({ prompt, className }) => {
   };
 
   const sendToWebhook = async () => {
-    const WEBHOOK_URL = "https://n8n-n8n.wljnsf.easypanel.host/webhook/resprompt";
+    const WEBHOOK_URL = "https://integra.devsible.com.br/webhook/resprompt";
     const proxyURL = `https://corsproxy.io/?${encodeURIComponent(WEBHOOK_URL)}`;
     
     setIsSending(true);
