@@ -17,20 +17,20 @@ const PromptPreview: React.FC<PromptPreviewProps> = ({ prompt, className }) => {
     try {
       await navigator.clipboard.writeText(prompt);
       setCopied(true);
-      toast.success("Prompt copied to clipboard");
+      toast.success("Prompt copiado para a área de transferência");
       
       setTimeout(() => {
         setCopied(false);
       }, 2000);
     } catch (err) {
-      toast.error("Failed to copy prompt");
+      toast.error("Falha ao copiar prompt");
     }
   };
 
   return (
     <div className={cn("rounded-xl overflow-hidden border border-border bg-card animate-slide-up", className)}>
       <div className="px-4 py-3 bg-muted/50 border-b border-border flex items-center justify-between">
-        <h3 className="text-sm font-medium">Generated Prompt</h3>
+        <h3 className="text-sm font-medium">Prompt Gerado</h3>
         <Button 
           variant="ghost" 
           size="sm" 
@@ -42,7 +42,7 @@ const PromptPreview: React.FC<PromptPreviewProps> = ({ prompt, className }) => {
           ) : (
             <Copy className="h-4 w-4 mr-1" />
           )}
-          {copied ? "Copied" : "Copy"}
+          {copied ? "Copiado" : "Copiar"}
         </Button>
       </div>
       <div className="p-4 bg-card overflow-auto max-h-96">

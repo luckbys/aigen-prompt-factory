@@ -14,10 +14,10 @@ const Navbar: React.FC<NavbarProps> = ({ className }) => {
           <div className="h-8 w-8 rounded-md bg-primary flex items-center justify-center mr-2">
             <div className="text-primary-foreground font-semibold text-lg">P</div>
           </div>
-          <h1 className="text-xl font-medium tracking-tight">Prompt Generator</h1>
+          <h1 className="text-xl font-medium tracking-tight">Gerador de Prompt</h1>
         </div>
         <div className="text-sm text-muted-foreground">
-          <span className="mr-2">•</span> AI System Prompts
+          <span className="mr-2">•</span> Prompts de Sistema IA
         </div>
       </div>
     </nav>

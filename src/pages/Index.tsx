@@ -12,12 +12,12 @@ const Index = () => {
           <div className="mb-10 text-center">
             <h1 className="text-4xl font-bold mb-4 tracking-tight">
               <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/70">
-                System Prompt Generator
+                Gerador de Prompt de Sistema
               </span>
             </h1>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Create effective system prompts for AI agents with this intuitive generator. 
-              Craft the perfect instructions to get the results you want.
+              Crie prompts de sistema eficazes para agentes de IA com este gerador intuitivo.
+              Elabore instruções perfeitas para obter os resultados que deseja.
             </p>
           </div>
           
@@ -27,7 +27,7 @@ const Index = () => {
       
       <footer className="py-6 border-t border-border mt-20">
         <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
-          <p>Designed for crafting refined system prompts.</p>
+          <p>Desenvolvido para criar prompts de sistema refinados.</p>
         </div>
       </footer>
     </div>
