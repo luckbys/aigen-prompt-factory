@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import PromptField from "./PromptField";
 import PromptPreview from "./PromptPreview";
 import PromptTips from "./PromptTips";
+import ModelGallery from "./ModelGallery";
+import Onboarding from "./Onboarding";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { 
@@ -26,11 +28,23 @@ import {
   ZapIcon,
   Settings,
   Save,
-  Share2
+  Share2,
+  Layout,
+  LayoutGrid,
+  Moon,
+  Sun,
+  Award,
+  BookOpen,
+  Grid,
+  ListFilter
 } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardFooter, CardDescription } from "@/components/ui/card";
 import { getGeminiSuggestion } from "@/services/geminiService";
 import { toast } from "sonner";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
+import { useTheme } from "@/components/theme-provider";
 
 interface PromptGeneratorProps {
   className?: string;
@@ -137,10 +151,28 @@ const PromptGenerator: React.FC<PromptGeneratorProps> = ({ className }) => {
   const [isGenerating, setIsGenerating] = useState<boolean>(false);
   const [isImproving, setIsImproving] = useState<boolean>(false);
   const [isCopied, setIsCopied] = useState<boolean>(false);
+  const [activeView, setActiveView] = useState<"split" | "edit" | "preview">("split");
+  const [promptCharCount, setPromptCharCount] = useState<number>(0);
+  const [showOnboarding, setShowOnboarding] = useState<boolean>(false);
+  const [templateView, setTemplateView] = useState<"buttons" | "gallery">("buttons");
+  const { theme, setTheme } = useTheme();
+
+  useEffect(() => {
+    const hasCompletedOnboarding = localStorage.getItem("onboarding-completed");
+    if (!hasCompletedOnboarding) {
+      setShowOnboarding(true);
+    }
+  }, []);
 
   useEffect(() => {
     generatePrompt();
   }, [formState]);
+
+  useEffect(() => {
+    if (generatedPrompt) {
+      setPromptCharCount(generatedPrompt.length);
+    }
+  }, [generatedPrompt]);
 
   const handleTemplateChange = (template: string) => {
     setActiveTemplate(template);
@@ -185,7 +217,6 @@ const PromptGenerator: React.FC<PromptGeneratorProps> = ({ className }) => {
   };
 
   const handleApplyTip = (tip: string) => {
-    // Determinar em qual campo aplicar a dica baseado no conteúdo
     if (tip.includes("tom") || tip.includes("comunique")) {
       handleInputChange("output", formState.output + (formState.output ? "\n\n" : "") + tip);
     } else if (tip.includes("exemplo") || tip.includes("Usuário:")) {
@@ -204,7 +235,6 @@ const PromptGenerator: React.FC<PromptGeneratorProps> = ({ className }) => {
   const handleGenerateWithGemini = async () => {
     setIsGenerating(true);
     try {
-      // Preparar os campos preenchidos para a geração
       const promptText = Object.entries(formState)
         .filter(([key, value]) => value && key !== 'name')
         .map(([key, value]) => `${key.toUpperCase()}: ${value}`)
@@ -259,7 +289,6 @@ const PromptGenerator: React.FC<PromptGeneratorProps> = ({ className }) => {
     setTimeout(() => setIsCopied(false), 2000);
   };
 
-  // Mapeamento de ícones para templates
   const templateIcons: { [key: string]: React.ReactNode } = {
     assistant: <Bot className="h-4 w-4 mr-2" />,
     expert: <GraduationCap className="h-4 w-4 mr-2" />,
@@ -272,51 +301,104 @@ const PromptGenerator: React.FC<PromptGeneratorProps> = ({ className }) => {
     atendimento: <HeadphonesIcon className="h-4 w-4 mr-2" />
   };
 
-  return (
-    <div className={cn("container mx-auto px-4 py-4", className)}>
-      <div className="flex flex-col space-y-8 md:flex-row md:space-y-0 md:space-x-8">
-        <div className="w-full md:w-2/5">
-          <Card className="mb-8 bg-white/90 dark:bg-card shadow-md border-primary/10 overflow-hidden group animate-fade-in">
-            <CardHeader className="pb-2 relative">
-              <CardTitle className="text-xl font-medium flex items-center">
-                <Star className="h-5 w-5 mr-2 text-primary group-hover:animate-pulse" />
-                Modelos Pré-definidos
-              </CardTitle>
-              <div className="absolute -right-20 -top-20 w-40 h-40 bg-primary/5 rounded-full animate-pulse-slow" />
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-wrap gap-2 mb-3">
-                {Object.entries(PRESET_TEMPLATES).map(([key, template]) => (
-                  <Button
-                    key={key}
-                    variant={activeTemplate === key ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => handleTemplateChange(key)}
-                    className="transition-all duration-200 relative overflow-hidden hover:scale-105 active:scale-95"
-                  >
-                    {templateIcons[key] || <Star className="h-4 w-4 mr-2" />}
-                    {template.name}
-                    {activeTemplate === key && (
-                      <span className="absolute bottom-0 left-0 h-0.5 bg-white w-full animate-grow-width" />
-                    )}
-                  </Button>
-                ))}
-              </div>
-              <p className="text-sm text-muted-foreground">
-                Selecione um modelo pré-definido como ponto de partida e personalize-o conforme suas necessidades.
-              </p>
-            </CardContent>
-          </Card>
+  const toggleTheme = () => {
+    setTheme(theme === 'dark' ? 'light' : 'dark');
+  };
 
-          <Card className="glass-panel shadow-md border-primary/10 mb-8 overflow-hidden relative animate-fade-in-up">
-            <div className="absolute -right-20 -bottom-20 w-40 h-40 bg-primary/5 rounded-full opacity-30" />
-            <CardHeader className="pb-2">
-              <CardTitle className="text-xl font-medium flex items-center">
-                <FileText className="h-5 w-5 mr-2 text-primary" />
-                Componentes do Prompt
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
+  const toggleTemplateView = () => {
+    setTemplateView(templateView === "buttons" ? "gallery" : "buttons");
+  };
+
+  const renderTemplateButtons = () => (
+    <div className="grid grid-cols-2 sm:grid-cols-3 md:flex md:flex-wrap gap-2 mb-3">
+      {Object.entries(PRESET_TEMPLATES).map(([key, template]) => (
+        <Button
+          key={key}
+          variant={activeTemplate === key ? "default" : "outline"}
+          size="sm"
+          onClick={() => handleTemplateChange(key)}
+          className={cn(
+            "transition-all duration-200 relative overflow-hidden hover:scale-105 active:scale-95 w-full",
+            activeTemplate === key && "shadow-md"
+          )}
+        >
+          {templateIcons[key] || <Star className="h-4 w-4 mr-2" />}
+          <span className="truncate">{template.name}</span>
+          {activeTemplate === key && (
+            <span className="absolute bottom-0 left-0 h-0.5 bg-white w-full animate-grow-width" />
+          )}
+        </Button>
+      ))}
+    </div>
+  );
+
+  const renderEditor = () => (
+    <div className="space-y-6">
+      <Card className="bg-white/90 dark:bg-card/90 shadow-md border-primary/10 overflow-hidden group animate-fade-in">
+        <CardHeader className="pb-2 relative">
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-xl font-medium flex items-center">
+              <Award className="h-5 w-5 mr-2 text-primary group-hover:animate-pulse" />
+              Modelos Pré-definidos
+            </CardTitle>
+            <div className="flex items-center gap-2">
+              <Badge variant="outline" className="text-xs">
+                {Object.keys(PRESET_TEMPLATES).length} modelos
+              </Badge>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={toggleTemplateView}
+                className="h-8 w-8 p-0"
+                title={templateView === "buttons" ? "Ver galeria" : "Ver botões"}
+              >
+                {templateView === "buttons" ? (
+                  <Grid className="h-4 w-4" />
+                ) : (
+                  <ListFilter className="h-4 w-4" />
+                )}
+              </Button>
+            </div>
+          </div>
+          <CardDescription className="text-muted-foreground text-sm">
+            Selecione um modelo como ponto de partida e personalize-o conforme suas necessidades.
+          </CardDescription>
+          <div className="absolute -right-20 -top-20 w-40 h-40 bg-primary/5 rounded-full animate-pulse-slow dark:bg-primary/10" />
+        </CardHeader>
+        <CardContent>
+          {templateView === "buttons" ? (
+            renderTemplateButtons()
+          ) : (
+            <ModelGallery
+              templates={PRESET_TEMPLATES}
+              activeTemplate={activeTemplate}
+              onSelectTemplate={handleTemplateChange}
+              templateIcons={templateIcons}
+            />
+          )}
+        </CardContent>
+      </Card>
+
+      <Card className="glass-panel shadow-md border-primary/10 overflow-hidden relative animate-fade-in-up">
+        <div className="absolute -right-20 -bottom-20 w-40 h-40 bg-primary/5 rounded-full opacity-30 dark:bg-primary/10" />
+        <CardHeader className="pb-2">
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-xl font-medium flex items-center">
+              <FileText className="h-5 w-5 mr-2 text-primary" />
+              Componentes do Prompt
+            </CardTitle>
+            <Badge variant="secondary" className="text-xs animate-pulse">
+              Editando: {activeTemplate ? PRESET_TEMPLATES[activeTemplate].name : "Personalizado"}
+            </Badge>
+          </div>
+        </CardHeader>
+        <CardContent className="max-h-[calc(100vh-16rem)] overflow-y-auto scrollbar-thin pr-4">
+          <Tabs defaultValue="basic" className="mb-6">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="basic">Básico</TabsTrigger>
+              <TabsTrigger value="advanced">Avançado</TabsTrigger>
+            </TabsList>
+            <TabsContent value="basic" className="mt-4 space-y-4">
               <PromptField
                 label="Papel"
                 name="role"
@@ -347,7 +429,8 @@ const PromptGenerator: React.FC<PromptGeneratorProps> = ({ className }) => {
                 multiline
                 icon={<Settings className="h-4 w-4 text-red-500" />}
               />
-              
+            </TabsContent>
+            <TabsContent value="advanced" className="mt-4 space-y-4">
               <PromptField
                 label="Diretrizes"
                 name="guidelines"
@@ -380,84 +463,177 @@ const PromptGenerator: React.FC<PromptGeneratorProps> = ({ className }) => {
                 multiline
                 icon={<Sparkles className="h-4 w-4 text-yellow-500" />}
               />
-            </CardContent>
-            <CardFooter className="flex justify-center gap-4 border-t border-border p-4">
-              <Button 
-                onClick={handleGenerateWithGemini} 
-                className="w-full bg-gradient-to-r from-primary to-primary/80 hover:opacity-90 hover:scale-105 active:scale-95 transition-all"
-                disabled={isGenerating}
-              >
-                {isGenerating ? (
-                  <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-                ) : (
-                  <Bot className="h-4 w-4 mr-2" />
-                )}
-                Gerar com IA
-              </Button>
-              <Button 
-                variant="outline" 
-                onClick={handleImprovePrompt}
-                className="w-full hover:scale-105 active:scale-95 transition-all"
-                disabled={isImproving || !generatedPrompt}
-              >
-                {isImproving ? (
-                  <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-                ) : (
-                  <Wand className="h-4 w-4 mr-2" />
-                )}
-                Aprimorar Prompt
-              </Button>
-            </CardFooter>
-          </Card>
-          
-          <PromptTips onApplyTip={handleApplyTip} className="mb-8 animate-fade-in-up" />
-        </div>
-        
-        <div className="w-full md:w-3/5 animate-fade-in">
-          <Card className="mb-6 p-4 bg-white/90 dark:bg-card/90 shadow-md border-primary/10 overflow-hidden relative">
-            <div className="flex items-center">
-              <Eye className="h-5 w-5 mr-2 text-primary" />
-              <h3 className="text-lg font-medium">Visualização do Prompt</h3>
-              <div className="ml-auto flex gap-2">
-                <Button variant="outline" size="sm" onClick={copyToClipboard} className="hover:scale-105 active:scale-95 transition-all">
-                  {isCopied ? (
-                    <CheckCircle2 className="h-3 w-3 mr-1 text-green-500" />
-                  ) : (
-                    <CopyCheck className="h-3 w-3 mr-1" />
-                  )}
-                  {isCopied ? "Copiado!" : "Copiar"}
-                </Button>
-                <Button variant="outline" size="sm" onClick={generatePrompt} className="hover:scale-105 active:scale-95 transition-all">
-                  <RefreshCw className="h-3 w-3 mr-1" />
-                  Atualizar
-                </Button>
-                <Button variant="outline" size="sm" onClick={handleImprovePrompt} disabled={isImproving || !generatedPrompt} className="hover:scale-105 active:scale-95 transition-all">
-                  {isImproving ? (
-                    <RefreshCw className="h-3 w-3 mr-1 animate-spin" />
-                  ) : (
-                    <Wand className="h-3 w-3 mr-1" />
-                  )}
-                  Aprimorar
-                </Button>
-              </div>
-            </div>
-            <div className="absolute -left-20 -bottom-20 w-40 h-40 bg-primary/5 rounded-full animate-pulse-slow" />
-          </Card>
-          <div className="animate-fade-in-up">
-            <PromptPreview prompt={generatedPrompt} className="sticky top-24" />
+            </TabsContent>
+          </Tabs>
+        </CardContent>
+        <CardFooter className="flex justify-center gap-4 border-t border-border p-4">
+          <Button 
+            onClick={handleGenerateWithGemini} 
+            className="w-full bg-gradient-to-r from-primary to-primary/80 hover:opacity-90 hover:scale-105 active:scale-95 transition-all"
+            disabled={isGenerating}
+          >
+            {isGenerating ? (
+              <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+            ) : (
+              <Bot className="h-4 w-4 mr-2" />
+            )}
+            Gerar com IA
+          </Button>
+          <Button 
+            variant="outline" 
+            onClick={handleImprovePrompt}
+            className="w-full hover:scale-105 active:scale-95 transition-all"
+            disabled={isImproving || !generatedPrompt}
+          >
+            {isImproving ? (
+              <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+            ) : (
+              <Wand className="h-4 w-4 mr-2" />
+            )}
+            Aprimorar
+          </Button>
+        </CardFooter>
+      </Card>
+      
+      <PromptTips onApplyTip={handleApplyTip} className="animate-fade-in-up" />
+    </div>
+  );
+
+  const renderPreview = () => (
+    <div className="space-y-4 animate-fade-in">
+      <Card className="p-4 bg-white/90 dark:bg-card/90 shadow-md border-primary/10 overflow-hidden relative">
+        <div className="flex items-center flex-wrap gap-2">
+          <div className="flex items-center">
+            <Eye className="h-5 w-5 mr-2 text-primary" />
+            <h3 className="text-lg font-medium">Visualização do Prompt</h3>
           </div>
-          <div className="flex justify-end gap-3 mt-4 animate-fade-in-up">
+          <Badge variant="secondary" className="text-xs ml-2">
+            {promptCharCount} caracteres
+          </Badge>
+          <div className="ml-auto flex flex-wrap gap-2">
             <Button variant="outline" size="sm" onClick={copyToClipboard} className="hover:scale-105 active:scale-95 transition-all">
-              <Save className="h-4 w-4 mr-2" />
-              Salvar Prompt
+              {isCopied ? (
+                <CheckCircle2 className="h-3 w-3 mr-1 text-green-500" />
+              ) : (
+                <CopyCheck className="h-3 w-3 mr-1" />
+              )}
+              {isCopied ? "Copiado!" : "Copiar"}
             </Button>
-            <Button size="sm" className="hover:scale-105 active:scale-95 transition-all">
-              <Share2 className="h-4 w-4 mr-2" />
-              Compartilhar
+            <Button variant="outline" size="sm" onClick={generatePrompt} className="hover:scale-105 active:scale-95 transition-all">
+              <RefreshCw className="h-3 w-3 mr-1" />
+              Atualizar
+            </Button>
+            <Button variant="outline" size="sm" onClick={handleImprovePrompt} disabled={isImproving || !generatedPrompt} className="hover:scale-105 active:scale-95 transition-all">
+              {isImproving ? (
+                <RefreshCw className="h-3 w-3 mr-1 animate-spin" />
+              ) : (
+                <Wand className="h-3 w-3 mr-1" />
+              )}
+              Aprimorar
+            </Button>
+          </div>
+        </div>
+        <div className="absolute -left-20 -bottom-20 w-40 h-40 bg-primary/5 rounded-full animate-pulse-slow dark:bg-primary/10" />
+      </Card>
+      <div className="animate-fade-in-up">
+        <PromptPreview prompt={generatedPrompt} />
+      </div>
+      <div className="flex justify-end gap-3 mt-4 animate-fade-in-up">
+        <Button variant="outline" size="sm" onClick={copyToClipboard} className="hover:scale-105 active:scale-95 transition-all">
+          <Save className="h-4 w-4 mr-2" />
+          Salvar Prompt
+        </Button>
+        <Button size="sm" className="hover:scale-105 active:scale-95 transition-all">
+          <Share2 className="h-4 w-4 mr-2" />
+          Compartilhar
+        </Button>
+      </div>
+    </div>
+  );
+
+  return (
+    <div className={cn("container mx-auto px-4 py-4", className)}>
+      <div className="flex justify-between items-center mb-6">
+        <div className="flex items-center">
+          <BookOpen className="h-6 w-6 mr-2 text-primary" />
+          <h1 className="text-2xl font-semibold">Gerador de Prompts AI</h1>
+        </div>
+        <div className="flex gap-2">
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={() => setShowOnboarding(true)}
+            className="gap-1"
+          >
+            <HelpCircle className="h-4 w-4" />
+            <span className="hidden sm:inline">Tutorial</span>
+          </Button>
+          <Button 
+            variant="outline" 
+            size="icon" 
+            onClick={toggleTheme} 
+            className="rounded-full h-8 w-8"
+          >
+            {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+          </Button>
+          <div className="inline-flex p-1 rounded-lg bg-muted">
+            <Button 
+              variant={activeView === "split" ? "default" : "ghost"} 
+              size="sm" 
+              onClick={() => setActiveView("split")}
+              className="rounded-md"
+            >
+              <LayoutGrid className="h-4 w-4 mr-2" />
+              <span className="hidden sm:inline">Dividido</span>
+            </Button>
+            <Button 
+              variant={activeView === "edit" ? "default" : "ghost"} 
+              size="sm" 
+              onClick={() => setActiveView("edit")}
+              className="rounded-md"
+            >
+              <FileText className="h-4 w-4 mr-2" />
+              <span className="hidden sm:inline">Editor</span>
+            </Button>
+            <Button 
+              variant={activeView === "preview" ? "default" : "ghost"} 
+              size="sm" 
+              onClick={() => setActiveView("preview")}
+              className="rounded-md"
+            >
+              <Eye className="h-4 w-4 mr-2" />
+              <span className="hidden sm:inline">Visualizar</span>
             </Button>
           </div>
         </div>
       </div>
+
+      <Separator className="mb-6" />
+
+      {activeView === "split" ? (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="space-y-6">
+            {renderEditor()}
+          </div>
+          <div className="space-y-4">
+            {renderPreview()}
+          </div>
+        </div>
+      ) : activeView === "edit" ? (
+        <div className="max-w-2xl mx-auto">
+          {renderEditor()}
+        </div>
+      ) : (
+        <div className="max-w-3xl mx-auto">
+          {renderPreview()}
+        </div>
+      )}
+
+      <Onboarding 
+        open={showOnboarding} 
+        onOpenChange={setShowOnboarding} 
+        onComplete={() => toast.success("Bem-vindo ao Gerador de Prompts AI!")} 
+      />
     </div>
   );
 };
