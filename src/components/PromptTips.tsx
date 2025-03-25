@@ -18,7 +18,10 @@ import {
   LayoutGrid,
   CheckCircle,
   BrainCircuit,
-  RefreshCw
+  RefreshCw,
+  Target,
+  Shield,
+  MessageSquare
 } from "lucide-react";
 import {
   Tabs,
@@ -164,6 +167,71 @@ const categoryIcons = {
   guidelines: <MessageCircle className="h-4 w-4" />,
   output: <LayoutGrid className="h-4 w-4" />,
   examples: <Bookmark className="h-4 w-4" />
+};
+
+const FeatureSection = ({ children, className }: { children: React.ReactNode, className?: string }) => {
+  return (
+    <div className={cn(
+      "relative overflow-hidden rounded-3xl border bg-background p-2",
+      "before:absolute before:inset-0 before:-translate-y-full before:animate-[shimmer_2s_infinite] before:bg-gradient-to-r before:from-transparent before:via-white/10 before:to-transparent",
+      className
+    )}>
+      <div className="relative h-full w-full rounded-2xl bg-gradient-to-b from-muted/50 to-muted p-6">
+        {children}
+      </div>
+      
+      {/* Decorative elements */}
+      <div className="absolute -z-10 inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 left-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl" />
+      </div>
+    </div>
+  );
+};
+
+const TipCard = ({ tip, onApply }: { 
+  tip: { 
+    title: string; 
+    description: string; 
+    example: string;
+    icon: React.ReactNode;
+    color: string;
+  };
+  onApply: () => void;
+}) => {
+  return (
+    <div className="group relative overflow-hidden rounded-lg border bg-background/50 p-1 transition-all duration-300 hover:bg-background">
+      <div className="relative h-full w-full rounded-[7px] bg-gradient-to-b from-muted/30 to-muted/50 p-4">
+        <div className="mb-3 flex items-center gap-2">
+          <div className={cn(
+            "p-1.5 rounded-md transition-all duration-300",
+            `bg-${tip.color}/10 text-${tip.color}`,
+            "group-hover:scale-110 group-hover:rotate-3"
+          )}>
+            {tip.icon}
+          </div>
+          <h3 className="font-medium text-sm">{tip.title}</h3>
+        </div>
+        
+        <p className="text-xs text-muted-foreground mb-3">{tip.description}</p>
+        
+        <div className="relative overflow-hidden rounded-md bg-muted/50 p-3 mb-3">
+          <div className="text-xs font-mono text-foreground/90">{tip.example}</div>
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+        </div>
+        
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          onClick={onApply}
+          className="w-full h-7 text-xs hover:bg-primary/10 hover:text-primary transition-all duration-300"
+        >
+          <Sparkles className="h-3 w-3 mr-1.5" />
+          Aplicar exemplo
+        </Button>
+      </div>
+    </div>
+  );
 };
 
 const PromptTips: React.FC<PromptTipsProps> = ({ onApplyTip, className }) => {
@@ -548,7 +616,7 @@ const PromptTips: React.FC<PromptTipsProps> = ({ onApplyTip, className }) => {
             </Button>
           </div>
         )}
-      </div>
+              </div>
     </CardContent>
   );
 
@@ -561,9 +629,9 @@ const PromptTips: React.FC<PromptTipsProps> = ({ onApplyTip, className }) => {
               <p className="text-xs text-muted-foreground line-clamp-1 group-hover:text-foreground/80 transition-colors">
                 • {tip.text.length > 60 ? tip.text.substring(0, 60) + "..." : tip.text}
               </p>
-              <Button
-                variant="ghost"
-                size="sm"
+              <Button 
+                variant="ghost" 
+                size="sm" 
                 onClick={() => {
                   handleApplyTip(tip);
                   setSelectedTip(tip.id);
@@ -602,9 +670,47 @@ const PromptTips: React.FC<PromptTipsProps> = ({ onApplyTip, className }) => {
           <span>Ver todas</span>
           <ChevronDown className="h-3 w-3" />
         </Button>
-      </div>
-    </CardContent>
+        </div>
+      </CardContent>
   );
+
+  const tips = [
+    {
+      title: "Seja específico",
+      description: "Defina claramente o que a IA deve e não deve fazer. Evite instruções vagas.",
+      example: "Forneça respostas curtas e diretas. Não use mais de 3 sentenças por resposta.",
+      icon: <Target className="h-4 w-4" />,
+      color: "blue"
+    },
+    {
+      title: "Use exemplos",
+      description: "Demonstre o comportamento desejado com exemplos concretos.",
+      example: "Usuário: Como é o clima hoje?\nAssistente: Em São Paulo, está ensolarado com máxima de 28°C.",
+      icon: <MessageSquare className="h-4 w-4" />,
+      color: "green"
+    },
+    {
+      title: "Defina o tom",
+      description: "Especifique como a IA deve se comunicar (formal, casual, técnico).",
+      example: "Comunique-se de forma casual e amigável, como se estivesse conversando com um amigo.",
+      icon: <Star className="h-4 w-4" />,
+      color: "yellow"
+    },
+    {
+      title: "Estabeleça limitações",
+      description: "Defina claramente o que a IA não deve fazer ou discutir.",
+      example: "Não forneça aconselhamento médico ou legal. Sugira consultar profissionais qualificados.",
+      icon: <Shield className="h-4 w-4" />,
+      color: "red"
+    },
+    {
+      title: "Estruture a saída",
+      description: "Defina como as respostas devem ser formatadas.",
+      example: "Estruture suas respostas em tópicos numerados com um resumo no final.",
+      icon: <Sparkles className="h-4 w-4" />,
+      color: "purple"
+    }
+  ];
 
   return (
     <Card 
@@ -657,7 +763,42 @@ const PromptTips: React.FC<PromptTipsProps> = ({ onApplyTip, className }) => {
           </CardFooter>
         </>
       ) : (
-        renderCompactContent()
+        <FeatureSection className={className}>
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="p-1.5 rounded-md bg-primary/10">
+                  <Lightbulb className="h-5 w-5 text-primary" />
+                </div>
+                <div>
+                  <h2 className="text-lg font-semibold">Dicas para Prompts</h2>
+                  <p className="text-sm text-muted-foreground">
+                    Melhore seus prompts com estas sugestões
+                  </p>
+                </div>
+              </div>
+              
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-8 w-8 p-0 hover:bg-primary/10"
+                title="Atualizar dicas"
+              >
+                <RefreshCw className="h-4 w-4" />
+              </Button>
+            </div>
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {tips.map((tip, index) => (
+                <TipCard
+                  key={index}
+                  tip={tip}
+                  onApply={() => onApplyTip(tip.example)}
+                />
+              ))}
+            </div>
+          </div>
+        </FeatureSection>
       )}
     </Card>
   );

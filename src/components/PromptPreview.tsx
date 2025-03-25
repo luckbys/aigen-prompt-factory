@@ -29,7 +29,7 @@ const PromptPreview: React.FC<PromptPreviewProps> = ({ prompt, className }) => {
   const [isSending, setIsSending] = useState(false);
   const [activeTab, setActiveTab] = useState<"preview" | "json">("preview");
   const [isExporting, setIsExporting] = useState(false);
-  const [webhookUrl, setWebhookUrl] = useState("https://integra.devsible.com.br/webhook/resprompt");
+  const [webhookUrl, setWebhookUrl] = useState("https://devisible-agentegen.wljnsf.easypanel.host/webhook-test/resprompt");
   const [showWebhookConfig, setShowWebhookConfig] = useState(false);
   const [debugMode, setDebugMode] = useState(false);
 
@@ -109,14 +109,10 @@ const PromptPreview: React.FC<PromptPreviewProps> = ({ prompt, className }) => {
     
     setIsSending(true);
     
-    // Criando o payload para o webhook
+    // Criando o payload para o webhook - formato simples
     const payload = {
-      prompt: prompt,
-      metadata: {
-        timestamp: new Date().toISOString(),
-        source: "aigen-prompt-generator",
-        version: "1.0"
-      }
+      prompt: prompt
+      // Outros metadados serão adicionados pelo serviço de proxy
     };
     
     try {
@@ -163,42 +159,93 @@ const PromptPreview: React.FC<PromptPreviewProps> = ({ prompt, className }) => {
   };
 
   return (
-    <Card className={cn("overflow-hidden border border-border/40", className)}>
+    <Card className={cn(
+      "overflow-hidden border border-border/40",
+      "backdrop-blur-sm bg-card/95",
+      "transition-all duration-300",
+      "hover:shadow-lg hover:shadow-primary/5",
+      "group",
+      className
+    )}>
       <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as "preview" | "json")}>
-        <div className="flex justify-between items-center p-3 bg-muted/50 border-b">
+        <div className="flex justify-between items-center p-3 bg-muted/30 border-b">
           <div className="flex items-center gap-2">
-            <TabsList className="h-8 p-1">
-              <TabsTrigger value="preview" className="h-6 px-2 text-xs">
+            <TabsList className="h-8 p-1 bg-background/50 backdrop-blur-sm">
+              <TabsTrigger 
+                value="preview" 
+                className={cn(
+                  "h-6 px-2 text-xs",
+                  "data-[state=active]:bg-primary",
+                  "data-[state=active]:text-primary-foreground",
+                  "transition-all duration-300"
+                )}
+              >
                 Visualização
               </TabsTrigger>
-              <TabsTrigger value="json" className="h-6 px-2 text-xs">
+              <TabsTrigger 
+                value="json" 
+                className={cn(
+                  "h-6 px-2 text-xs",
+                  "data-[state=active]:bg-primary",
+                  "data-[state=active]:text-primary-foreground",
+                  "transition-all duration-300"
+                )}
+              >
                 JSON
               </TabsTrigger>
             </TabsList>
-            {prompt && <Badge variant="outline" className="text-xs">{prompt.length} caracteres</Badge>}
+            {prompt && (
+              <Badge 
+                variant="outline" 
+                className={cn(
+                  "text-xs",
+                  "bg-background/50 backdrop-blur-sm",
+                  "transition-all duration-300",
+                  "group-hover:border-primary/30"
+                )}
+              >
+                {prompt.length} caracteres
+              </Badge>
+            )}
           </div>
           <div className="flex gap-2">
             <Button
               variant="ghost"
               size="sm"
               onClick={handleCopy}
-              className="h-8 w-8 p-0 rounded-full"
+              className={cn(
+                "h-8 w-8 p-0 rounded-full",
+                "transition-all duration-300",
+                "hover:bg-primary/10 hover:text-primary"
+              )}
               title="Copiar"
             >
-              {isCopied ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
+              {isCopied ? (
+                <Check className="h-4 w-4 text-green-500" />
+              ) : (
+                <Copy className="h-4 w-4" />
+              )}
             </Button>
             <Button
               variant="ghost"
               size="sm"
               onClick={activeTab === "json" ? downloadJSON : downloadPrompt}
-              className="h-8 w-8 p-0 rounded-full"
+              className={cn(
+                "h-8 w-8 p-0 rounded-full",
+                "transition-all duration-300",
+                "hover:bg-primary/10 hover:text-primary"
+              )}
               disabled={isExporting}
               title={activeTab === "json" ? "Baixar JSON" : "Baixar TXT"}
             >
               {isExporting ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
               ) : (
-                activeTab === "json" ? <FileJson className="h-4 w-4" /> : <Download className="h-4 w-4" />
+                activeTab === "json" ? (
+                  <FileJson className="h-4 w-4" />
+                ) : (
+                  <Download className="h-4 w-4" />
+                )
               )}
             </Button>
           </div>
@@ -206,26 +253,67 @@ const PromptPreview: React.FC<PromptPreviewProps> = ({ prompt, className }) => {
         
         <CardContent className="p-0">
           <TabsContent value="preview" className="m-0">
-            <div className="bg-card p-4 relative">
-              <pre className="whitespace-pre-wrap text-sm break-words font-sans max-h-[calc(100vh-15rem)] overflow-y-auto scrollbar-thin pr-2">
-                {prompt || <span className="text-muted-foreground italic">Seu prompt aparecerá aqui...</span>}
+            <div className={cn(
+              "bg-card p-4 relative",
+              "transition-all duration-300",
+              "group-hover:bg-primary/5"
+            )}>
+              <pre className={cn(
+                "whitespace-pre-wrap text-sm break-words font-sans",
+                "max-h-[calc(100vh-15rem)] overflow-y-auto scrollbar-thin pr-2",
+                "transition-colors duration-300"
+              )}>
+                {prompt || (
+                  <span className="text-muted-foreground italic">
+                    Seu prompt aparecerá aqui...
+                  </span>
+                )}
               </pre>
+              
+              {/* Decorative elements */}
+              <div className="absolute -z-10 inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none">
+                <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl" />
+                <div className="absolute bottom-0 left-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl" />
+              </div>
             </div>
           </TabsContent>
           
           <TabsContent value="json" className="m-0">
-            <div className="bg-card p-4 relative">
-              <pre className="whitespace-pre-wrap text-xs break-words font-mono bg-muted/30 p-3 rounded-md max-h-[calc(100vh-15rem)] overflow-y-auto scrollbar-thin">
-                {prompt ? formatJSON() : <span className="text-muted-foreground italic">JSON será exibido aqui quando você gerar um prompt...</span>}
+            <div className={cn(
+              "bg-card p-4 relative",
+              "transition-all duration-300",
+              "group-hover:bg-primary/5"
+            )}>
+              <pre className={cn(
+                "whitespace-pre-wrap text-xs break-words font-mono",
+                "bg-muted/30 p-3 rounded-lg",
+                "max-h-[calc(100vh-15rem)] overflow-y-auto scrollbar-thin",
+                "transition-colors duration-300",
+                "group-hover:bg-muted/50"
+              )}>
+                {prompt ? formatJSON() : (
+                  <span className="text-muted-foreground italic">
+                    JSON será exibido aqui quando você gerar um prompt...
+                  </span>
+                )}
               </pre>
             </div>
           </TabsContent>
         </CardContent>
       </Tabs>
       
-      <CardFooter className="p-3 border-t bg-card flex justify-between items-center">
+      <CardFooter className={cn(
+        "p-3 border-t bg-card/95 backdrop-blur-sm",
+        "flex justify-between items-center",
+        "transition-all duration-300",
+        "group-hover:bg-primary/5"
+      )}>
         <span className="text-xs text-muted-foreground">
-          {prompt ? "Pronto para usar em qualquer IA" : "Configure os parâmetros para gerar seu prompt"}
+          {prompt ? (
+            "Pronto para usar em qualquer IA"
+          ) : (
+            "Configure os parâmetros para gerar seu prompt"
+          )}
         </span>
         <div className="flex gap-2">
           {/* Dialog para configurar o webhook */}
@@ -234,14 +322,18 @@ const PromptPreview: React.FC<PromptPreviewProps> = ({ prompt, className }) => {
               <Button
                 variant="ghost"
                 size="sm"
-                className="gap-1 h-8"
+                className={cn(
+                  "gap-1 h-8",
+                  "transition-all duration-300",
+                  "hover:bg-primary/10 hover:text-primary"
+                )}
                 title="Configurar webhook"
               >
                 <Settings className="h-3.5 w-3.5" />
                 <span className="hidden sm:inline">Configurar</span>
               </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
+            <DialogContent className="sm:max-w-[425px] backdrop-blur-sm bg-background/95">
               <DialogHeader>
                 <DialogTitle>Configuração do Webhook</DialogTitle>
               </DialogHeader>
@@ -275,7 +367,14 @@ const PromptPreview: React.FC<PromptPreviewProps> = ({ prompt, className }) => {
                 </div>
               </div>
               <DialogFooter>
-                <Button onClick={saveWebhookConfig} className="gap-1">
+                <Button 
+                  onClick={saveWebhookConfig} 
+                  className={cn(
+                    "gap-1",
+                    "bg-primary text-primary-foreground",
+                    "hover:bg-primary/90"
+                  )}
+                >
                   <Save className="h-4 w-4" />
                   Salvar
                 </Button>
@@ -287,7 +386,11 @@ const PromptPreview: React.FC<PromptPreviewProps> = ({ prompt, className }) => {
             variant="outline"
             size="sm"
             onClick={() => window.open("https://chat.openai.com", "_blank")}
-            className="gap-1 h-8"
+            className={cn(
+              "gap-1 h-8",
+              "transition-all duration-300",
+              "hover:bg-primary/10 hover:text-primary"
+            )}
           >
             <ExternalLink className="h-3.5 w-3.5" />
             <span className="hidden sm:inline">Abrir ChatGPT</span>
@@ -297,7 +400,12 @@ const PromptPreview: React.FC<PromptPreviewProps> = ({ prompt, className }) => {
             onClick={sendToWebhook}
             disabled={isSending || !prompt}
             size="sm"
-            className="gap-1 h-8 bg-gradient-to-r from-primary to-primary/80 hover:opacity-90 transition-opacity"
+            className={cn(
+              "gap-1 h-8",
+              "bg-gradient-to-r from-primary to-primary/80",
+              "hover:opacity-90 transition-opacity",
+              "shadow-lg shadow-primary/20"
+            )}
           >
             {isSending ? (
               <Loader2 className="h-3.5 w-3.5 animate-spin" />

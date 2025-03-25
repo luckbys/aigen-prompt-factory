@@ -136,19 +136,24 @@ const ModelGallery: React.FC<ModelGalleryProps> = ({
       </div>
       
       {filteredTemplates.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredTemplates.map(([key, template]) => (
-            <ModelCard
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6 animate-fade-in">
+          {filteredTemplates.map(([key, template], index) => (
+            <div 
               key={key}
-              name={template.name}
-              role={template.role}
-              goal={template.goal}
-              icon={templateIcons[key]}
-              category={MODEL_CATEGORIES[key] || "Outro"}
-              rating={MODEL_RATINGS[key] || 3.5}
-              onSelect={() => onSelectTemplate(key)}
-              isSelected={key === activeTemplate}
-            />
+              className="animate-fade-up"
+              style={{ animationDelay: `${index * 100}ms` }}
+            >
+              <ModelCard
+                name={template.name}
+                role={template.role}
+                goal={template.goal}
+                icon={templateIcons[key]}
+                category={MODEL_CATEGORIES[key] || "Outro"}
+                rating={MODEL_RATINGS[key] || 3.5}
+                onSelect={() => onSelectTemplate(key)}
+                isSelected={key === activeTemplate}
+              />
+            </div>
           ))}
         </div>
       ) : (
