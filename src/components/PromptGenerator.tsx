@@ -748,87 +748,15 @@ const PromptGenerator: React.FC<PromptGeneratorProps> = ({ className }) => {
         <div className="absolute -right-20 -top-20 w-40 h-40 bg-primary/5 rounded-full animate-pulse-slow" />
         <div className="absolute -left-20 -bottom-20 w-40 h-40 bg-primary/5 rounded-full animate-pulse-slow opacity-30" />
         
-        {/* Indicador de progresso circular */}
-        <div className={cn(
-          "absolute top-4 right-4 w-16 h-16",
-          "rounded-full",
-          "flex items-center justify-center",
-          "transition-all duration-500",
-          "group cursor-help",
-          "hover:scale-110"
-        )}>
-          {/* Círculo de fundo com animação de pulso */}
-          <div className={cn(
-            "absolute inset-0 rounded-full",
-            "bg-primary/5",
-            "animate-pulse-slow"
-          )} />
-          
-          {/* Círculo de progresso */}
-          <svg className="absolute w-full h-full -rotate-90">
-            <circle
-              cx="32"
-              cy="32"
-              r="28"
-              strokeWidth="3"
-              stroke="var(--primary)"
-              fill="none"
-              className="opacity-20"
-            />
-            <circle
-              cx="32"
-              cy="32"
-              r="28"
-              strokeWidth="3"
-              stroke="var(--primary)"
-              fill="none"
-              strokeLinecap="round"
-              className="transition-all duration-500"
-              style={{
-                strokeDasharray: `${2 * Math.PI * 28}`,
-                strokeDashoffset: `${2 * Math.PI * 28 * (1 - currentStep / (STEPS.length - 1))}`,
-              }}
-            />
-          </svg>
-          
-          {/* Valor do progresso com animação */}
-          <div className={cn(
-            "relative z-10 flex flex-col items-center",
-            "text-primary font-medium",
-            "transition-all duration-300",
-            "group-hover:scale-110"
-          )}>
-            <span className="text-xl">
-              {Math.round((currentStep / (STEPS.length - 1)) * 100)}
-            </span>
-            <span className="text-xs text-primary/70">%</span>
-          </div>
-          
-          {/* Tooltip */}
-          <div className={cn(
-            "absolute -bottom-12 left-1/2 -translate-x-1/2 whitespace-nowrap",
-            "px-3 py-1.5 rounded-lg",
-            "bg-popover/95 backdrop-blur-sm",
-            "border border-border",
-            "text-xs font-medium",
-            "opacity-0 translate-y-2",
-            "transition-all duration-200",
-            "pointer-events-none",
-            "group-hover:opacity-100 group-hover:translate-y-0"
-          )}>
-            {completedSteps.size} de {STEPS.length} etapas concluídas
-          </div>
-          
-          {/* Efeito de brilho */}
-          <div className={cn(
-            "absolute inset-0 rounded-full",
-            "bg-gradient-to-r from-transparent via-primary/10 to-transparent",
-            "animate-shimmer",
-            "opacity-0 group-hover:opacity-100",
-            "transition-opacity duration-300"
-          )} />
-        </div>
-        
+        {/* Indicador de progresso */}
+        <ProgressIndicator 
+          progress={progress}
+          currentStep={currentStep}
+          totalSteps={STEPS.length}
+          completedSteps={completedSteps}
+        />
+
+        {/* Conteúdo do passo atual */}
         {(() => {
           switch (step.id) {
             case 'template':
@@ -990,16 +918,11 @@ const PromptGenerator: React.FC<PromptGeneratorProps> = ({ className }) => {
   const renderStepIndicator = () => {
     return (
       <div className="flex items-center justify-center gap-2 mb-6 relative">
-        {/* Linha de progresso no fundo */}
-        <div className="absolute h-0.5 bg-muted w-full max-w-[80%] top-1/2 -translate-y-1/2" />
-        <div 
-          className="absolute h-0.5 bg-primary transition-all duration-500" 
-          style={{ 
-            width: `${progress}%`,
-            maxWidth: '80%',
-            top: '50%',
-            transform: 'translateY(-50%)'
-          }} 
+        <ProgressIndicator 
+          progress={progress}
+          currentStep={currentStep}
+          totalSteps={STEPS.length}
+          completedSteps={completedSteps}
         />
       </div>
     );
@@ -1124,87 +1047,6 @@ const PromptGenerator: React.FC<PromptGeneratorProps> = ({ className }) => {
             </div>
           </div>
         </div>
-
-        {/* Indicador de Progresso Circular */}
-        <div className={cn(
-          "absolute top-4 right-4 w-16 h-16",
-          "rounded-full",
-          "flex items-center justify-center",
-          "transition-all duration-500",
-          "group cursor-help",
-          "hover:scale-110"
-        )}>
-          {/* Círculo de fundo com animação de pulso */}
-          <div className={cn(
-            "absolute inset-0 rounded-full",
-            "bg-primary/5",
-            "animate-pulse-slow"
-          )} />
-          
-          {/* Círculo de progresso */}
-          <svg className="absolute w-full h-full -rotate-90">
-            <circle
-              cx="32"
-              cy="32"
-              r="28"
-              strokeWidth="3"
-              stroke="var(--primary)"
-              fill="none"
-              className="opacity-20"
-            />
-            <circle
-              cx="32"
-              cy="32"
-              r="28"
-              strokeWidth="3"
-              stroke="var(--primary)"
-              fill="none"
-              strokeLinecap="round"
-              className="transition-all duration-500"
-              style={{
-                strokeDasharray: `${2 * Math.PI * 28}`,
-                strokeDashoffset: `${2 * Math.PI * 28 * (1 - currentStep / (totalSteps - 1))}`,
-              }}
-            />
-          </svg>
-          
-          {/* Valor do progresso com animação */}
-          <div className={cn(
-            "relative z-10 flex flex-col items-center",
-            "text-primary font-medium",
-            "transition-all duration-300",
-            "group-hover:scale-110"
-          )}>
-            <span className="text-xl">
-              {Math.round(progress)}
-            </span>
-            <span className="text-xs text-primary/70">%</span>
-          </div>
-          
-          {/* Tooltip */}
-          <div className={cn(
-            "absolute -bottom-12 left-1/2 -translate-x-1/2 whitespace-nowrap",
-            "px-3 py-1.5 rounded-lg",
-            "bg-popover/95 backdrop-blur-sm",
-            "border border-border",
-            "text-xs font-medium",
-            "opacity-0 translate-y-2",
-            "transition-all duration-200",
-            "pointer-events-none",
-            "group-hover:opacity-100 group-hover:translate-y-0"
-          )}>
-            {completedSteps.size} de {totalSteps} etapas concluídas
-          </div>
-          
-          {/* Efeito de brilho */}
-          <div className={cn(
-            "absolute inset-0 rounded-full",
-            "bg-gradient-to-r from-transparent via-primary/10 to-transparent",
-            "animate-shimmer",
-            "opacity-0 group-hover:opacity-100",
-            "transition-opacity duration-300"
-          )} />
-        </div>
       </div>
     );
   };
@@ -1222,167 +1064,224 @@ const PromptGenerator: React.FC<PromptGeneratorProps> = ({ className }) => {
         <div className="absolute top-1/4 left-1/4 w-60 h-60 bg-primary/5 rounded-full animate-pulse-slow opacity-20" />
         <div className="absolute bottom-1/4 right-1/4 w-60 h-60 bg-primary/5 rounded-full animate-pulse-slow opacity-20" />
       </div>
-      
-      <Layout
-        leftPanel={renderLeftPanel()}
-        rightPanel={renderRightPanel()}
-        progress={progress}
-      >
-        <div className="space-y-8 max-w-4xl mx-auto px-4 py-6 relative">
-          <ProgressIndicator 
-            progress={progress}
-            currentStep={currentStep}
-            totalSteps={STEPS.length}
-            completedSteps={completedSteps}
-          />
 
-          {/* Indicadores de Passo */}
-          {renderStepIndicator()}
-
-          {/* Navegação entre Passos */}
-          <div className="flex items-center justify-between">
-            <Button
-              variant="outline"
-              onClick={handlePreviousStep}
-              disabled={currentStep === 0}
-              className={cn(
-                "gap-2 transition-all duration-300",
-                "hover:border-primary hover:-translate-x-1",
-                "group relative overflow-hidden",
-                currentStep === 0 ? "opacity-50" : "hover:border-primary"
-              )}
-            >
-              <ChevronLeft className="h-4 w-4 group-hover:animate-bounce-subtle" />
-              <span className="relative z-10">Anterior</span>
-              {/* Efeito de hover */}
-              <div className="absolute inset-0 bg-primary/10 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-300" />
-            </Button>
-            
-            <span className="text-sm font-medium">
-              Passo {currentStep + 1} de {STEPS.length}
-            </span>
-            
-            <Button
-              onClick={handleNextStep}
-              disabled={currentStep === STEPS.length - 1 || !completedSteps.has(currentStep)}
-              className={cn(
-                "gap-2 transition-all duration-300",
-                "hover:translate-x-1",
-                "group relative overflow-hidden",
-                (currentStep === STEPS.length - 1 || !completedSteps.has(currentStep)) ? 
-                "opacity-50" : 
-                "bg-gradient-to-r from-primary to-primary/80 hover:opacity-90"
-              )}
-            >
-              <span className="relative z-10">Próximo</span>
-              <ChevronRight className="h-4 w-4 group-hover:animate-bounce-subtle" />
-              {/* Efeito de hover */}
-              <div className="absolute inset-0 bg-white/10 translate-x-[100%] group-hover:translate-x-0 transition-transform duration-300" />
-            </Button>
-          </div>
-
-          {/* Título e Descrição do Passo Atual */}
-          <div className="text-center space-y-4 py-6">
-            <div className="flex items-center justify-center gap-3">
-              <div className={cn(
-                "p-3 rounded-full transition-all duration-300",
-                "bg-gradient-to-br",
-                completedSteps.has(currentStep) ? 
-                  "from-primary/30 to-primary/10" : 
-                  "from-muted to-muted/50",
-                "animate-bounce-subtle shadow-lg"
-              )}>
-                {STEPS[currentStep].icon}
-              </div>
-              <h2 className={cn(
-                "text-3xl font-semibold",
-                "bg-clip-text text-transparent",
-                "bg-gradient-to-r from-foreground to-foreground/80",
-                "animate-fade-up"
-              )}>
-                {STEPS[currentStep].title}
-              </h2>
-            </div>
-            <p className={cn(
-              "text-muted-foreground text-lg max-w-2xl mx-auto",
-              "animate-fade-up",
-              "opacity-0 animate-in fade-in-50 duration-500 delay-200"
-            )}>
-              {STEPS[currentStep].description}
-            </p>
-          </div>
-
-          {/* Conteúdo do Passo Atual */}
-          <div className="max-w-3xl mx-auto">
-            {renderStepContent()}
-          </div>
-
-          {/* Dicas e Sugestões */}
-          {currentStep < STEPS.length - 1 && (
-            <div className="mt-8 text-center">
-              <div className={cn(
-                "inline-flex items-center gap-2 px-4 py-2 rounded-full",
-                "bg-muted/50 backdrop-blur-sm",
-                "text-sm text-muted-foreground",
-                "animate-pulse-subtle",
-                "shadow-lg border border-border/50",
-                "transition-all duration-300 hover:scale-105"
-              )}>
-                {completedSteps.has(currentStep) ? (
-                  <>
-                    <CheckCircle2 className="h-4 w-4 text-green-500" />
-                    <span className="bg-gradient-to-r from-green-500 to-emerald-500 text-transparent bg-clip-text">
-                      Passo concluído! Você pode avançar para o próximo.
-                    </span>
-                  </>
-                ) : (
-                  <>
-                    <Sparkles className="h-4 w-4 text-primary" />
-                    <span>
-                      Preencha o campo acima para avançar para o próximo passo.
-                    </span>
-                  </>
-                )}
-              </div>
-            </div>
-          )}
+      <div className="container mx-auto px-4 py-8">
+        {/* Cabeçalho */}
+        <div className="mb-8 text-center">
+          <h1 className={cn(
+            "text-4xl font-bold mb-2",
+            "bg-gradient-to-r from-primary to-primary/80 text-transparent bg-clip-text",
+            "animate-fade-up"
+          )}>
+            Gerador de Prompts AI
+          </h1>
+          <p className="text-muted-foreground text-lg max-w-2xl mx-auto animate-fade-up delay-100">
+            Crie prompts poderosos e eficientes para IAs com nossa ferramenta intuitiva
+          </p>
         </div>
-      </Layout>
-      
-      <Onboarding 
-        open={showOnboarding} 
-        onOpenChange={setShowOnboarding} 
-        onComplete={() => toast.success("Bem-vindo ao Gerador de Prompts AI!")} 
-      />
 
-      <Dialog open={showKeyboardShortcuts} onOpenChange={setShowKeyboardShortcuts}>
-        <DialogContent className="sm:max-w-md backdrop-blur-sm bg-background/95">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Keyboard className="h-5 w-5" />
-              Atalhos do Teclado
-            </DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="text-sm font-medium">Ctrl/⌘ + S</div>
-              <div className="text-sm text-muted-foreground">Salvar alterações</div>
-              
-              <div className="text-sm font-medium">Ctrl/⌘ + Z</div>
-              <div className="text-sm text-muted-foreground">Desfazer</div>
-              
-              <div className="text-sm font-medium">Ctrl/⌘ + Shift + Z</div>
-              <div className="text-sm text-muted-foreground">Refazer</div>
-              
-              <div className="text-sm font-medium">Ctrl/⌘ + Y</div>
-              <div className="text-sm text-muted-foreground">Refazer (alternativo)</div>
-              
-              <div className="text-sm font-medium">Ctrl/⌘ + /</div>
-              <div className="text-sm text-muted-foreground">Mostrar atalhos</div>
+        {/* Layout Principal */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          {/* Painel Esquerdo */}
+          <div className="lg:col-span-5 space-y-6">
+            {/* Card de Modelos */}
+            <Card className={cn(
+              "overflow-hidden border-primary/10",
+              "backdrop-blur-sm bg-background/60",
+              "transition-all duration-300",
+              "hover:shadow-lg hover:shadow-primary/5",
+              "group"
+            )}>
+              <CardHeader className="space-y-1">
+                <CardTitle className="text-2xl flex items-center gap-2">
+                  <Star className="h-6 w-6 text-primary animate-pulse" />
+                  Modelos Pré-definidos
+                </CardTitle>
+                <CardDescription>
+                  Escolha um modelo base para começar seu prompt
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                  {Object.entries(PRESET_TEMPLATES).map(([key, template]) => (
+                    <Button
+                      key={key}
+                      variant={activeTemplate === key ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => handleTemplateChange(key)}
+                      className={cn(
+                        "transition-all duration-200",
+                        "hover:scale-105 active:scale-95",
+                        "relative overflow-hidden",
+                        activeTemplate === key && "shadow-md"
+                      )}
+                    >
+                      <div className="flex items-center gap-2">
+                        {templateIcons[key] || <Star className="h-4 w-4" />}
+                        <span className="truncate">{template.name}</span>
+                      </div>
+                      {activeTemplate === key && (
+                        <div className="absolute bottom-0 left-0 h-0.5 w-full bg-primary animate-grow-width" />
+                      )}
+                    </Button>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Campos do Prompt */}
+            <div className="space-y-6">
+              <PromptField
+                label="Papel"
+                name="role"
+                value={formState.role}
+                onChange={(value) => handleInputChange("role", value)}
+                multiline
+                icon={<Bot className="h-4 w-4" />}
+                helperText="Defina o papel ou persona que a IA deve assumir"
+              />
+              <PromptField
+                label="Objetivo"
+                name="goal"
+                value={formState.goal}
+                onChange={(value) => handleInputChange("goal", value)}
+                multiline
+                icon={<Target className="h-4 w-4" />}
+                helperText="Especifique o objetivo principal do prompt"
+              />
+              <PromptField
+                label="Restrições"
+                name="constraints"
+                value={formState.constraints}
+                onChange={(value) => handleInputChange("constraints", value)}
+                multiline
+                icon={<Shield className="h-4 w-4" />}
+                helperText="Liste as limitações e restrições"
+              />
+              <PromptField
+                label="Diretrizes"
+                name="guidelines"
+                value={formState.guidelines}
+                onChange={(value) => handleInputChange("guidelines", value)}
+                multiline
+                icon={<ListChecks className="h-4 w-4" />}
+                helperText="Forneça diretrizes e instruções específicas"
+              />
+              <PromptField
+                label="Formato de Saída"
+                name="output"
+                value={formState.output}
+                onChange={(value) => handleInputChange("output", value)}
+                multiline
+                icon={<FileText className="h-4 w-4" />}
+                helperText="Especifique o formato desejado para a saída"
+              />
+              <PromptField
+                label="Exemplos"
+                name="examples"
+                value={formState.examples}
+                onChange={(value) => handleInputChange("examples", value)}
+                multiline
+                icon={<MessageSquare className="h-4 w-4" />}
+                helperText="Forneça exemplos de interações"
+              />
+            </div>
+
+            {/* Botões de Ação */}
+            <div className="flex gap-4">
+              <Button
+                onClick={handleGenerateWithGemini}
+                disabled={isGenerating}
+                className={cn(
+                  "flex-1",
+                  "bg-gradient-to-r from-primary to-primary/80",
+                  "hover:opacity-90 transition-all",
+                  "hover:scale-105 active:scale-95"
+                )}
+              >
+                {isGenerating ? (
+                  <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                ) : (
+                  <Bot className="h-4 w-4 mr-2" />
+                )}
+                Gerar com IA
+              </Button>
+              <Button
+                variant="outline"
+                onClick={handleImprovePrompt}
+                disabled={isImproving || !generatedPrompt}
+                className={cn(
+                  "flex-1",
+                  "hover:border-primary hover:bg-primary/10",
+                  "transition-all",
+                  "hover:scale-105 active:scale-95"
+                )}
+              >
+                {isImproving ? (
+                  <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                ) : (
+                  <Wand className="h-4 w-4 mr-2" />
+                )}
+                Aprimorar
+              </Button>
             </div>
           </div>
-        </DialogContent>
-      </Dialog>
+
+          {/* Painel Direito */}
+          <div className="lg:col-span-7 space-y-6">
+            {/* Visualização do Prompt */}
+            <Card className={cn(
+              "overflow-hidden border-primary/10",
+              "backdrop-blur-sm bg-background/60",
+              "transition-all duration-300",
+              "hover:shadow-lg hover:shadow-primary/5",
+              "sticky top-4"
+            )}>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-2xl flex items-center gap-2">
+                  <Eye className="h-6 w-6 text-primary" />
+                  Visualização do Prompt
+                </CardTitle>
+                <CardDescription>
+                  Veja como seu prompt ficará e faça ajustes conforme necessário
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <PromptPreview prompt={generatedPrompt} />
+              </CardContent>
+              <CardFooter className="flex justify-end gap-3 border-t pt-4">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={copyToClipboard}
+                  className="hover:scale-105 active:scale-95 transition-all"
+                >
+                  {isCopied ? (
+                    <CheckCircle2 className="h-4 w-4 mr-2 text-green-500" />
+                  ) : (
+                    <CopyCheck className="h-4 w-4 mr-2" />
+                  )}
+                  {isCopied ? "Copiado!" : "Copiar"}
+                </Button>
+                <Button
+                  size="sm"
+                  className={cn(
+                    "bg-gradient-to-r from-primary to-primary/80",
+                    "hover:opacity-90 transition-all",
+                    "hover:scale-105 active:scale-95"
+                  )}
+                >
+                  <Share2 className="h-4 w-4 mr-2" />
+                  Compartilhar
+                </Button>
+              </CardFooter>
+            </Card>
+
+            {/* Dicas de Prompt */}
+            <PromptTips onApplyTip={handleApplyTip} />
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
