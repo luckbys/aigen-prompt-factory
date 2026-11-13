@@ -1,9 +1,11 @@
-import { toast } from "sonner";
+interface WebhookPayload {
+  prompt: unknown;
+}
 
 /**
  * Formata o payload para garantir compatibilidade com diferentes sistemas
  */
-const formatPayload = (data: any) => {
+const formatPayload = (data: WebhookPayload) => {
   // Extrair apenas o prompt e alguns metadados principais
   const simplifiedPayload = {
     prompt: typeof data.prompt === 'string' ? data.prompt : JSON.stringify(data.prompt),
@@ -18,7 +20,7 @@ const formatPayload = (data: any) => {
  * Função que envia a requisição para o webhook contornando problemas de CORS
  * Esta implementação simula um envio bem-sucedido já que o servidor não tem CORS configurado
  */
-export const sendToWebhookProxy = async (url: string, data: any): Promise<{success: boolean, message: string}> => {
+export const sendToWebhookProxy = async (url: string, data: WebhookPayload): Promise<{success: boolean, message: string}> => {
   try {
     // Verificar e corrigir URL para o formato correto
     let correctedUrl = url;
@@ -108,7 +110,7 @@ export const sendToWebhookProxy = async (url: string, data: any): Promise<{succe
  * Envia o prompt para um webhook configurado em webhook.site 
  * Isto é apenas para depuração, pois o webhook.site permite análise da requisição
  */
-export const sendToDebugWebhook = async (data: any): Promise<{success: boolean, message: string}> => {
+export const sendToDebugWebhook = async (data: WebhookPayload): Promise<{success: boolean, message: string}> => {
   try {
     const DEBUG_WEBHOOK = "https://webhook.site/94a3cb12-18b4-4f20-990c-ae17c22d2c00";
     

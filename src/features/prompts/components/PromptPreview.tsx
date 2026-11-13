@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { sendToWebhookProxy, sendToDebugWebhook } from "@/services/proxyService";
+import { sendToWebhookProxy, sendToDebugWebhook } from "@/features/prompts/services/proxyService";
 import { Switch } from "@/components/ui/switch";
 
 interface PromptPreviewProps {

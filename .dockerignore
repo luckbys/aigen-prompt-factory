@@ -1,0 +1,16 @@
+.git
+.github
+.agents
+.codex
+node_modules
+dist
+dist-ssr
+coverage
+.npm-cache
+.env
+.env.*
+!.env.example
+*.local
+*.log
+.vscode
+.idea

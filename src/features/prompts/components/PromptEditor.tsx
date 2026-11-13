@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Loader2, Save, Wand2 } from "lucide-react";
 import { toast } from "sonner";
-import { savePrompt } from "@/services/storageService";
+import { savePrompt } from "@/features/prompts/services/storageService";
 
 interface PromptEditorProps {
   onPromptChange: (prompt: string) => void;
