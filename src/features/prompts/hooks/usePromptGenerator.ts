@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { PRESET_TEMPLATES } from "../data/templates";
 import { formatPrompt } from "../lib/formatPrompt";
@@ -18,9 +18,13 @@ export function usePromptGenerator() {
   const [isImproving, setIsImproving] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
   const generatedPrompt = useMemo(() => aiPrompt ?? formatPrompt(formState), [aiPrompt, formState]);
+  const latestState = useRef({ activeTemplate, formState, history });
+  const unsaved = useRef(false);
+  latestState.current = { activeTemplate, formState, history };
 
   const handleTemplateChange = useCallback((template: string) => {
     if (!PRESET_TEMPLATES[template]) return;
+    unsaved.current = true;
     setHistory(prev => [formState, ...prev].slice(0, 50));
     setUndoStack(prev => [formState, ...prev]);
     setRedoStack([]);
@@ -30,6 +34,7 @@ export function usePromptGenerator() {
   }, [formState]);
 
   const handleInputChange = useCallback((field: PromptFieldName, value: string) => {
+    unsaved.current = true;
     setFormState(prev => ({ ...prev, [field]: value, lastModified: new Date().toISOString() }));
     setAiPrompt(null);
   }, []);
@@ -37,6 +42,7 @@ export function usePromptGenerator() {
   const handleSave = useCallback(() => {
     try {
       saveGeneratorState({ activeTemplate, formState, history });
+      unsaved.current = false;
       toast.success("Alterações salvas com sucesso!");
     } catch (error) {
       console.error("Erro ao salvar:", error);
@@ -46,6 +52,7 @@ export function usePromptGenerator() {
 
   const handleUndo = useCallback(() => {
     if (!undoStack.length) return;
+    unsaved.current = true;
     setRedoStack(prev => [formState, ...prev]);
     setUndoStack(undoStack.slice(1));
     setFormState(undoStack[0]);
@@ -55,6 +62,7 @@ export function usePromptGenerator() {
 
   const handleRedo = useCallback(() => {
     if (!redoStack.length) return;
+    unsaved.current = true;
     setUndoStack(prev => [formState, ...prev]);
     setRedoStack(redoStack.slice(1));
     setFormState(redoStack[0]);
@@ -66,6 +74,23 @@ export function usePromptGenerator() {
     const timer = window.setTimeout(handleSave, 30000);
     return () => window.clearTimeout(timer);
   }, [handleSave]);
+
+  useEffect(() => {
+    const flush = () => {
+      if (!unsaved.current) return;
+      try {
+        saveGeneratorState(latestState.current);
+        unsaved.current = false;
+      } catch {
+        toast.error("Não foi possível salvar o prompt antes de sair.");
+      }
+    };
+    window.addEventListener("pagehide", flush);
+    return () => {
+      window.removeEventListener("pagehide", flush);
+      flush();
+    };
+  }, []);
 
   useEffect(() => {
     const handleKeyboard = (event: KeyboardEvent) => {

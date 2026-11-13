@@ -18,6 +18,8 @@ Com os valores padrão, abra `http://IP_DA_VPS:8080` e libere a porta TCP 8080 n
 
 O build instala pelo lockfile, verifica tipos, executa os testes e compila o frontend. Apenas o Nginx e os arquivos estáticos ficam na imagem final. O container roda como usuário `nginx`, com filesystem somente leitura, diretório temporário em memória, logs com rotação e healthcheck. O Nginx disponibiliza `/healthz`, cache dos assets versionados e fallback para `index.html`.
 
+O gerador de prompts fica em `/` e o wizard de ideias de jogos em `/ideia-do-jogo`. O fallback do Nginx permite abrir e recarregar essa rota diretamente. Os rascunhos de ideias são locais ao navegador e não precisam de volumes ou banco de dados no container.
+
 ## Domínio e HTTPS
 
 Para usar um proxy reverso instalado na VPS, configure:
