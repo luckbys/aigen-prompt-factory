@@ -1,4 +1,5 @@
 import { toast } from "sonner";
+import type { PromptTip } from "../types";
 
 // Interface para os parâmetros da solicitação
 interface GeminiRequestParams {
@@ -71,9 +72,9 @@ export const getGeminiSuggestion = async ({ prompt, type }: GeminiRequestParams)
   }
 };
 
-export const getGeminiTips = async ({ category, count = 3 }: GeminiTipsRequestParams): Promise<any[]> => {
+export const getGeminiTips = async ({ category, count = 3 }: GeminiTipsRequestParams): Promise<PromptTip[]> => {
   try {
-    let systemPrompt = "Você é um especialista em prompts para IAs. Gere dicas úteis para melhorar prompts.";
+    const systemPrompt = "Você é um especialista em prompts para IAs. Gere dicas úteis para melhorar prompts.";
     
     let promptText = "Gere exatamente " + count + " dicas originais e úteis para melhorar prompts de IA";
     
@@ -129,7 +130,7 @@ export const getGeminiTips = async ({ category, count = 3 }: GeminiTipsRequestPa
           const tips = JSON.parse(jsonStr);
           
           // Adicionar IDs e valores padrão
-          return tips.map((tip: any, index: number) => ({
+          return tips.map((tip: Omit<PromptTip, "id">, index: number) => ({
             id: `gemini-${Date.now()}-${index}`,
             text: tip.text,
             category: tip.category,

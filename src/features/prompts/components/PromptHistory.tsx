@@ -5,8 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { toast } from "sonner";
-import { getPrompts, deletePrompt, toggleFavorite, importPrompts, exportPrompts } from '@/services/storageService';
-import type { SavedPrompt } from '@/services/storageService';
+import { getPrompts, deletePrompt, toggleFavorite, importPrompts, exportPrompts } from '@/features/prompts/services/storageService';
+import type { SavedPrompt } from '@/features/prompts/services/storageService';
 import { Star, Download, Upload, Search, Trash2, Copy } from 'lucide-react';
 
 interface PromptHistoryProps {

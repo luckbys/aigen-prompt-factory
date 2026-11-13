@@ -13,15 +13,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-interface PromptTemplate {
-  name: string;
-  role: string;
-  goal: string;
-  constraints: string;
-  guidelines: string;
-  output: string;
-  examples: string;
-}
+import type { PromptTemplate } from "../types";
 
 interface ModelGalleryProps {
   templates: Record<string, PromptTemplate>;

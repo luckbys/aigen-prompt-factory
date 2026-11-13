@@ -1,10 +1,10 @@
 import React from 'react';
-import PromptGenerator from './components/PromptGenerator';
-import { ThemeProvider } from './components/theme-provider';
+import PromptGenerator from '@/features/prompts/components/PromptGenerator';
+import { AppProviders } from './AppProviders';
 
 function App() {
   return (
-    <ThemeProvider defaultTheme="light">
+    <AppProviders>
       <div className="min-h-screen bg-background">
         <div className="fixed inset-0 bg-gradient-to-br from-background to-background via-muted/20 -z-10" />
         <div className="fixed inset-0 bg-grid-pattern opacity-[0.03] -z-10" />
@@ -19,7 +19,7 @@ function App() {
           </div>
         </footer>
       </div>
-    </ThemeProvider>
+    </AppProviders>
   );
 }
 

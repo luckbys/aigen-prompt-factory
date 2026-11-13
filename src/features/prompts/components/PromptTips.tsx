@@ -44,7 +44,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { getGeminiTips } from "@/services/geminiService";
+import { getGeminiTips } from "@/features/prompts/services/geminiService";
 import { toast } from "sonner";
 
 interface PromptTipsProps {
@@ -52,15 +52,7 @@ interface PromptTipsProps {
   className?: string;
 }
 
-interface Tip {
-  id: string;
-  text: string;
-  category: 'constraints' | 'guidelines' | 'output' | 'examples';
-  tags: string[];
-  popularity?: number; // De 0 a 5, onde 5 é o mais popular
-  useCount?: number; // Número de vezes que a dica foi aplicada
-  isNew?: boolean; // Indica se é uma nova dica
-}
+import type { PromptTip as Tip } from "../types";
 
 const DEFAULT_PROMPT_TIPS: Tip[] = [
   {
